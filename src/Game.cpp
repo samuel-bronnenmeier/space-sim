@@ -56,7 +56,8 @@ void Game::displayIntro()
     std::cout << "Welcome to Space Colony Simulator!" << std::endl
               << "----------------------------------" << std::endl
               << "Lorem ipsum..." << std::endl
-              << "Use the help feature excessively if this is your first time here..." << std::endl
+              << "Type in the number of your wished action and press enter." << std::endl
+              << "If this is your first time here you might want to start with the help feature." << std::endl
               << std::endl;
 }
 
@@ -70,6 +71,7 @@ int Game::getInput()
 
 void Game::handleInput(int input)
 {
+    int inp;
     switch (input)
     {
     case CONTROL_ERROR:
@@ -97,6 +99,9 @@ void Game::handleInput(int input)
         break;
 
     case CONTROL_HELP:
+        mainHelp();
+        inp = getInput();
+        handleInput(inp);
         break;
 
     default:

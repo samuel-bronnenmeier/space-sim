@@ -1,4 +1,8 @@
-enum CONTROL {
+#ifndef CONTROL_H
+#define CONTROL_H
+
+enum CONTROL
+{
     CONTROL_ERROR = -1,
     CONTROL_QUIT = 0,
     CONTROL_EXPLORE,
@@ -7,3 +11,5 @@ enum CONTROL {
     CONTROL_STATS,
     CONTROL_HELP
 };
+
+#endif
