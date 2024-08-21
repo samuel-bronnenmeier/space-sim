@@ -1,0 +1,3 @@
+enum ERROR {
+    ERROR_INPUT_HANDLING
+};
