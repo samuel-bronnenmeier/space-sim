@@ -7,7 +7,7 @@ Map::Map()
 
 int Map::exploreTile(int dir)
 {
-    int tile = std::rand() % (TILE_NUMBER + 1);
+    int tile = std::rand() % (TILE_NUMBER);
 
     map[dir].push_back(tile);
 

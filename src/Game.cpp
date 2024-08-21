@@ -9,9 +9,15 @@ Game::Game()
     stats.water = STARTING_WATER;
     stats.stone = 0;
 
+    stats.d_food = 0;
+    stats.d_water = 0;
+    stats.d_stone = 0;
+
     stats.peopleKilled = 0;
 
     map = new Map;
+
+    playerName = "";
 
     quit = false;
     dead = false;
@@ -33,6 +39,8 @@ int Game::run()
 
         updateStats();
 
+        std::cout << std::endl;
+
         displayStats(true);
 
         turn++;
@@ -45,10 +53,11 @@ int Game::run()
 
 void Game::displayIntro()
 {
-    std::cout << "Welcome to Space Colony Simulator!" << std::endl;
-    std::cout << "Type in your name: ";
-    std::cin >> playerName;
-    std::cout << "Hello " << playerName << "!" << std::endl;
+    std::cout << "Welcome to Space Colony Simulator!" << std::endl
+              << "----------------------------------" << std::endl
+              << "Lorem ipsum..." << std::endl
+              << "Use the help feature excessively if this is your first time here..." << std::endl
+              << std::endl;
 }
 
 int Game::getInput()
@@ -133,7 +142,7 @@ void Game::explore()
                 break;
 
             case TILE_STONE:
-                std::cout << "The remaining part of the group managed to bring back " << price << " stones." << std::endl;
+                std::cout << "The remaining part of the group managed to brings back " << price << " stones." << std::endl;
                 stats.stone += price;
                 break;
 
@@ -143,7 +152,7 @@ void Game::explore()
         }
         else
         {
-            stats.peopleKilled -= stats.peopleKilled - stats.people;
+            stats.peopleKilled += stats.people - killed;
             stats.people = 0;
         }
     }
@@ -200,26 +209,25 @@ void Game::build()
         int price = calculateActualPrice(peoplePrice);
         kill(price);
 
+        stats.stone -= stonePrice;
+
         if (!dead)
         {
             switch (building)
             {
             case 0:
                 stats.d_water += stonePrice / 1.5;
-                std::cout << "You built a well. " << price << " people lost their life..." << std::endl
-                          << std::endl;
+                std::cout << "You built a well. " << price << " people lost their life..." << std::endl;
                 break;
 
             case 1:
                 stats.d_food += stonePrice / 1.5;
-                std::cout << "You built a plant house. " << price << " died during construction..." << std::endl
-                          << std::endl;
+                std::cout << "You built a plant house. " << price << " died during construction..." << std::endl;
                 break;
 
             case 2:
                 stats.d_stone += stonePrice / 1.5;
-                std::cout << "You built a quarry. " << price << " people have gone lost somewhere..." << std::endl
-                          << std::endl;
+                std::cout << "You built a quarry. " << price << " people have gone lost somewhere..." << std::endl;
                 break;
 
             default:
@@ -247,7 +255,18 @@ void Game::updateStats()
     }
     else
     {
-        std::cout << "Your colony is drinking and eating..." << std::endl;
+        // Colonists' reproduction
+        stats.people += stats.people / 6;
+        std::cout << "Your colony grew a bit as new people were made..." << std::endl;
+
+        // Buildings producing
+        stats.food += stats.d_food;
+        stats.water += stats.d_water;
+        stats.stone += stats.d_stone;
+
+        // Eating and drinking
+        std::cout
+            << "Your colony is drinking and eating..." << std::endl;
 
         int foodNeeded = stats.people / 2;
         int waterNeeded = stats.people;
@@ -256,6 +275,7 @@ void Game::updateStats()
         {
             std::cout << "Some people didn't get something to eat. They died." << std::endl;
             kill(foodNeeded - stats.food);
+            stats.food = 0;
         }
         else
         {
@@ -266,14 +286,12 @@ void Game::updateStats()
         {
             std::cout << "Some people didn't get something to drink. They died." << std::endl;
             kill(waterNeeded - stats.water);
+            stats.water = 0;
         }
         else
         {
             stats.water -= waterNeeded;
         }
-
-        stats.people += stats.people / 5;
-        std::cout << "Your colony grew a bit as new people were made..." << std::endl;
     }
 }
 
@@ -289,9 +307,9 @@ void Game::displayStats(bool endOfTurn)
     }
 
     std::cout << "People: " << stats.people << std::endl;
-    std::cout << "Food: " << stats.food << std::endl;
-    std::cout << "Water: " << stats.water << std::endl;
-    std::cout << "Stone: " << stats.stone << std::endl;
+    std::cout << "Food: " << stats.food << " ... +" << stats.d_food << "/turn" << std::endl;
+    std::cout << "Water: " << stats.water << " ... +" << stats.d_water << "/turn" << std::endl;
+    std::cout << "Stone: " << stats.stone << " ... +" << stats.d_stone << "/turn" << std::endl;
 
     std::cout << "You killed " << stats.peopleKilled << " people so far." << std::endl;
 }
@@ -332,7 +350,6 @@ void Game::kill(int peopleToKill)
     }
 }
 
-/// @brief Shows death message and sets game end flag.
 void Game::die()
 {
     quit = true;
