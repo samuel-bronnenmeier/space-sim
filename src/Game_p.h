@@ -1,11 +1,13 @@
 #include <iostream>
 #include <string>
 #include <random>
+#include <ctime>
 
 #include <Stats_p.h>
 #include <Control_p.h>
 #include <Error_p.h>
 #include <Map_p.h>
+#include <Help_p.h>
 
 class Game
 {
@@ -24,6 +26,9 @@ private:
 
     // Flag for quitting
     bool quit;
+
+    // Flag for death
+    bool dead;
 
 public:
     Game();

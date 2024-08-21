@@ -14,10 +14,13 @@ Game::Game()
     map = new Map;
 
     quit = false;
+    dead = false;
 }
 
 int Game::run()
 {
+    srand(time(0));
+
     displayIntro();
 
     int input;
@@ -73,9 +76,11 @@ void Game::handleInput(int input)
         break;
 
     case CONTROL_BUILD:
+        build();
         break;
 
     case CONTROL_EXTRACT:
+        extract();
         break;
 
     case CONTROL_STATS:
@@ -93,7 +98,7 @@ void Game::handleInput(int input)
 
 void Game::explore()
 {
-    std::cout << "You decided to go exploring unknown parts of the planet." << std::endl;
+    std::cout << "You decided to go exploring unknown parts of the planet, possibly leaving some of your colonists out there..." << std::endl;
     std::cout << "What direction do you want to go? (0=north, 1=east, 2=south, 3=west)" << std::endl;
 
     int dir = 0;
@@ -148,6 +153,90 @@ void Game::explore()
         int input = getInput();
         handleInput(input);
     }
+}
+
+void Game::build()
+{
+
+    std::cout << "You decided to build something on the cost of stone and probably some lives..." << std::endl;
+    std::cout << "What do you want to build? (0=well, 1=plant house, 2=quarry, 3=descriptions)" << std::endl;
+
+    int building;
+    std::cin >> building;
+
+    if (building == 3)
+    {
+        buildingHelp();
+        build();
+        return;
+    }
+
+    int stonePrice = 0;
+
+    while (true)
+    {
+        std::cout << "With how much stone do you want to build? You have " << stats.stone << " stone..." << std::endl;
+        std::cin >> stonePrice;
+
+        if (stonePrice > stats.stone)
+        {
+            std::cout << "You don't have that much stone." << std::endl;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    int peoplePrice = stonePrice / 2;
+
+    std::cout << "With that much stone being used, up to " << peoplePrice << " people could die. The building would produce " << (int)(stonePrice / 1.5) << " units per turn." << std::endl;
+    std::cout << "Do you want to do build it? (no=0, yes=1)" << std::endl;
+
+    int confirm = 0;
+    std::cin >> confirm;
+    if (confirm)
+    {
+        int price = calculateActualPrice(peoplePrice);
+        kill(price);
+
+        if (!dead)
+        {
+            switch (building)
+            {
+            case 0:
+                stats.d_water += stonePrice / 1.5;
+                std::cout << "You built a well. " << price << " people lost their life..." << std::endl
+                          << std::endl;
+                break;
+
+            case 1:
+                stats.d_food += stonePrice / 1.5;
+                std::cout << "You built a plant house. " << price << " died during construction..." << std::endl
+                          << std::endl;
+                break;
+
+            case 2:
+                stats.d_stone += stonePrice / 1.5;
+                std::cout << "You built a quarry. " << price << " people have gone lost somewhere..." << std::endl
+                          << std::endl;
+                break;
+
+            default:
+                break;
+            }
+        }
+    }
+    else
+    {
+        std::cout << "You decide to not build anything..." << std::endl;
+        int input = getInput();
+        handleInput(input);
+    }
+}
+
+void Game::extract()
+{
 }
 
 void Game::updateStats()
@@ -209,7 +298,11 @@ void Game::displayStats(bool endOfTurn)
 
 void Game::displayOutro()
 {
-    std::cout << "You ended the game. See you next time..." << std::endl;
+    if (dead)
+    {
+        std::cout << "No colonist is left. You can't sustain yourself and die." << std::endl;
+    }
+    std::cout << "The game ended. See you next time..." << std::endl;
 }
 
 int Game::errorHandler(int e)
@@ -243,7 +336,7 @@ void Game::kill(int peopleToKill)
 void Game::die()
 {
     quit = true;
-    std::cout << "No one is left in your colony. You can't sustain yourself and therefore die." << std::endl;
+    dead = true;
 }
 
 Game::~Game()
