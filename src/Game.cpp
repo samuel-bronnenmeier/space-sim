@@ -54,9 +54,19 @@ void Game::displayIntro()
     std::cout << "----------------------------------" << std::endl
               << "Space Colony Simulator" << std::endl
               << "----------------------------------" << std::endl
-              << "Lorem ipsum..." << std::endl
+              << "Humanity has made it. They made Earth a planet almost uninhabitable and certainly no place on would want to be." << std::endl
+              << "Fortunately, technology has come far in the meantime, enabling space exploration missions, which have lately even been successful." << std::endl
+              << "A few planets not too dissimilar from Earth have been found, and the Internation Space Agency (ISA) decided to send humans up there in order to colonize them." << std::endl
+              << "But as there are not enough specalists on Earth, these 'colony starters' are organized by several AIs, one of which is you." << std::endl
+              << "(Press enter to continue)" << std::endl;
+    std::cin.ignore();
+    std::cout << "You just landed on your new home planet and your colony is motivated to make a home out of it." << std::endl
+              << "You are starting with " << STARTING_PEOPLE << " colonists." << std::endl
+              << "In the storage room " << STARTING_FOOD << " units of food and " << STARTING_WATER << " units of water are left." << std::endl
+              << "It looks like the planet's surface could be harvested for stone. The radar also states more water and food could be found there." << std::endl
+              << std::endl
               << "Type in the number of your wished action and press enter." << std::endl
-              << "If this is your first time here you might want to start with the help feature." << std::endl
+              << "If this is your first time here you might want to start with the help feature, which explains every action you can take." << std::endl
               << std::endl;
 }
 
