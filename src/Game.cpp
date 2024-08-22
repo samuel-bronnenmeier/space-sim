@@ -39,8 +39,6 @@ int Game::run()
 
         updateStats();
 
-        std::cout << std::endl;
-
         displayStats(true);
 
         turn++;
@@ -53,7 +51,8 @@ int Game::run()
 
 void Game::displayIntro()
 {
-    std::cout << "Welcome to Space Colony Simulator!" << std::endl
+    std::cout << "----------------------------------" << std::endl
+              << "Space Colony Simulator" << std::endl
               << "----------------------------------" << std::endl
               << "Lorem ipsum..." << std::endl
               << "Type in the number of your wished action and press enter." << std::endl
@@ -152,6 +151,7 @@ void Game::explore()
                 break;
 
             default:
+                errorHandler(ERROR_INPUT_HANDLING);
                 break;
             }
         }
@@ -236,6 +236,7 @@ void Game::build()
                 break;
 
             default:
+                errorHandler(ERROR_INPUT_HANDLING);
                 break;
             }
         }
@@ -250,6 +251,77 @@ void Game::build()
 
 void Game::extract()
 {
+    std::cout << "You want to extract something from the ground. This is and really dangerous and could go wrong..." << std::endl
+              << "What do you want to extract? (0=food, 1=water, 2=stone)" << std::endl;
+
+    int ressource;
+    std::cin >> ressource;
+
+    int price;
+    while (true)
+    {
+        std::cout << "How many people do you want to send? Your colony currently holds " << stats.people << " people..." << std::endl;
+        std::cin >> price;
+
+        if (price > stats.people)
+        {
+            std::cout << "Your colony isn't that big..." << std::endl;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    std::cout << "Every person that doesn't die could carry a unit if it finds one." << std::endl
+              << "Do you want to do it? (0=no, 1=yes)" << std::endl;
+
+    int confirm = 0;
+    std::cin >> confirm;
+    if (confirm)
+    {
+        int actualPrice = calculateActualPrice(price);
+        kill(actualPrice);
+
+        int amount = price - actualPrice;
+
+        if (!dead && (amount != 0))
+        {
+            int actualAmount = rand() % (amount + 1);
+
+            switch (ressource)
+            {
+            case 0:
+                stats.food += actualAmount;
+                std::cout << "Some colonists came back with " << actualAmount << " food. " << actualPrice << " people lost their life..." << std::endl;
+                break;
+
+            case 1:
+                stats.water += actualAmount;
+                std::cout << actualAmount << " units of water have been found. " << actualPrice << " didn't make it..." << std::endl;
+                break;
+
+            case 2:
+                stats.stone += actualAmount;
+                std::cout << "Some stone has been dug up. " << actualPrice << " people have gone lost somewhere..." << std::endl;
+                break;
+
+            default:
+                errorHandler(ERROR_INPUT_HANDLING);
+                break;
+            }
+        }
+        else
+        {
+            std::cout << "Seems like no one came back..." << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "You decide to not build anything..." << std::endl;
+        int input = getInput();
+        handleInput(input);
+    }
 }
 
 void Game::updateStats()
@@ -261,8 +333,13 @@ void Game::updateStats()
     else
     {
         // Colonists' reproduction
-        stats.people += stats.people / 6;
-        std::cout << "Your colony grew a bit as new people were made..." << std::endl;
+        int d_people = stats.people / 6;
+        if (d_people < 1)
+        {
+            d_people = 1;
+        }
+        stats.people += d_people;
+        std::cout << "Your colony grew a bit as " << d_people << " people were made..." << std::endl;
 
         // Buildings producing
         stats.food += stats.d_food;
@@ -302,6 +379,10 @@ void Game::updateStats()
 
 void Game::displayStats(bool endOfTurn)
 {
+
+    std::cout << std::endl
+              << "-----------------------------" << std::endl;
+
     if (endOfTurn)
     {
         std::cout << "At the end of turn " << turn << " your stats are as following:" << std::endl;
@@ -317,6 +398,16 @@ void Game::displayStats(bool endOfTurn)
     std::cout << "Stone: " << stats.stone << " ... +" << stats.d_stone << "/turn" << std::endl;
 
     std::cout << "You killed " << stats.peopleKilled << " people so far." << std::endl;
+
+    std::cout << "-----------------------------" << std::endl
+              << std::endl;
+
+    if (!endOfTurn)
+    {
+        int input = getInput();
+
+        handleInput(input);
+    }
 }
 
 void Game::displayOutro()
@@ -330,8 +421,22 @@ void Game::displayOutro()
 
 int Game::errorHandler(int e)
 {
-    std::cout << "!ERROR: " << e << std::endl;
-    quit = true;
+    std::string msg;
+
+    switch (e)
+    {
+    case ERROR_INPUT_HANDLING:
+        msg = "Faulty input. Please be more careful next time.";
+        break;
+
+    default:
+        quit = true;
+        msg = "Unknown error...";
+        break;
+    }
+
+    std::cout << "!ERROR: " << msg << std::endl;
+
     return e;
 }
 
