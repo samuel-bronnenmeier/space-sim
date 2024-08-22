@@ -424,9 +424,19 @@ void Game::displayOutro()
 {
     if (dead)
     {
-        std::cout << "No colonist is left. You can't sustain yourself and die." << std::endl;
+        std::cout << "No colonist is left. You can't sustain yourself and die. This planet will not be a future home for humanity..." << std::endl;
+        std::cout << "Your colony survived " << turn << " turns, during which a total of " << stats.peopleKilled << " people died on your behalf..." << std::endl;
+        if (stats.peopleKilled > 50)
+        {
+            std::cout << "Maybe killing all those colonists was your goal all along?" << std::endl
+                      << "We will probably never know..." << std::endl;
+        }
+        std::cout << "The game ends here, reality begins. See you next time..." << std::endl;
     }
-    std::cout << "The game ended. See you next time..." << std::endl;
+    else
+    {
+        std::cout << "You abandon your colony and end the game for now. We hope to hear from you again...";
+    }
 }
 
 int Game::errorHandler(int e)

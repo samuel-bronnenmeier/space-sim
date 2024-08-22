@@ -11,3 +11,5 @@ void exploringHelp();
 void buildingHelp();
 
 void extractingHelp();
+
+void ressourceHelp();
